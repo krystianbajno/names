@@ -33,6 +33,10 @@ def ascify_polish_letters(data):
 def get_only_names(data):
     return [[row[2]] for row in data]
 
+def topx(data, x):
+    """Filter the first x rows from the data."""
+    return data[:x]
+
 def read_data():
     lines = sys.stdin.read().strip().split('\n')
     return [line.split(',') for line in lines[1:]]
@@ -51,8 +55,10 @@ if __name__ == "__main__":
         "capitalize",
         "lowercase",
         "ascii",
-        "names"
+        "names",
+        "topx"
     ], help="The operations to perform on the data in sequence.")
+    parser.add_argument("--x", type=int, default=None, help="Number of top entries to keep for the 'topx' operation.")
 
     args = parser.parse_args()
 
@@ -70,6 +76,11 @@ if __name__ == "__main__":
     data = read_data()
 
     for operation in args.operations:
-        data = operations[operation](data)
+        if operation == "topx":
+            if args.x is None:
+                raise ValueError("The 'topx' operation requires the '--x' argument.")
+            data = topx(data, args.x)
+        else:
+            data = operations[operation](data)
 
     print_data(data)
